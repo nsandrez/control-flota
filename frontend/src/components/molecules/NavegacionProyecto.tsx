@@ -12,6 +12,7 @@ export function NavegacionProyecto({ proyectoId }: PropsNavegacionProyecto) {
   const secciones = [
     { destino: `/proyectos/${proyectoId}/vehiculos`, texto: 'Vehículos' },
     { destino: `/proyectos/${proyectoId}/conductores`, texto: 'Conductores' },
+    { destino: `/proyectos/${proyectoId}/tipos-documento`, texto: 'Documentos requeridos' },
   ]
   return (
     <nav aria-label="Secciones del proyecto" className="border-b border-slate-200 dark:border-slate-800">
