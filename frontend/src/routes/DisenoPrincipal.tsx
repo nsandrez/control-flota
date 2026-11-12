@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth'
 // Visible to ADMIN and OPERADOR alike (OPERADOR reads the catalog)
 const ENLACES: EnlaceNavegacion[] = [
   { a: '/proyectos', texto: 'Proyectos' },
+  { a: '/tipos-documento', texto: 'Tipos de documento' },
 ]
 
 export function DisenoPrincipal() {

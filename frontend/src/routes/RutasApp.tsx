@@ -5,6 +5,9 @@ import { PaginaLogin } from '../pages/PaginaLogin'
 import { PaginaNoEncontrada } from '../pages/PaginaNoEncontrada'
 import { PaginaProyectoFormulario } from '../pages/PaginaProyectoFormulario'
 import { PaginaProyectos } from '../pages/PaginaProyectos'
+import { PaginaTipoDocumentoFormulario } from '../pages/PaginaTipoDocumentoFormulario'
+import { PaginaTiposDocumento } from '../pages/PaginaTiposDocumento'
+import { PaginaTiposDocumentoProyecto } from '../pages/PaginaTiposDocumentoProyecto'
 import { PaginaVehiculoFormulario } from '../pages/PaginaVehiculoFormulario'
 import { PaginaVehiculos } from '../pages/PaginaVehiculos'
 import { DisenoPrincipal } from './DisenoPrincipal'
@@ -46,6 +49,19 @@ export function RutasApp() {
           <Route
             path="/proyectos/:proyectoId/conductores/:id/editar"
             element={<PaginaConductorFormulario />}
+          />
+
+          {/* Document types: catalog readable by ADMIN and OPERADOR, writes ADMIN only */}
+          <Route path="/tipos-documento" element={<PaginaTiposDocumento />} />
+          <Route element={<RutaPorRol roles={['ADMIN']} />}>
+            <Route path="/tipos-documento/nuevo" element={<PaginaTipoDocumentoFormulario />} />
+            <Route path="/tipos-documento/:id/editar" element={<PaginaTipoDocumentoFormulario />} />
+          </Route>
+
+          {/* Required document types of a project (read: ADMIN and OPERADOR; writes: ADMIN, hidden in UI otherwise) */}
+          <Route
+            path="/proyectos/:proyectoId/tipos-documento"
+            element={<PaginaTiposDocumentoProyecto />}
           />
 
           <Route path="*"element={<PaginaNoEncontrada />} />
