@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router'
 import { PaginaConductorFormulario } from '../pages/PaginaConductorFormulario'
 import { PaginaConductores } from '../pages/PaginaConductores'
+import { PaginaDocumentosConductor } from '../pages/PaginaDocumentosConductor'
+import { PaginaDocumentosVehiculo } from '../pages/PaginaDocumentosVehiculo'
 import { PaginaLogin } from '../pages/PaginaLogin'
 import { PaginaNoEncontrada } from '../pages/PaginaNoEncontrada'
 import { PaginaProyectoFormulario } from '../pages/PaginaProyectoFormulario'
@@ -62,6 +64,16 @@ export function RutasApp() {
           <Route
             path="/proyectos/:proyectoId/tipos-documento"
             element={<PaginaTiposDocumentoProyecto />}
+          />
+
+          {/* Uploaded documents of a vehicle / driver (write rules are enforced in the page by role) */}
+          <Route
+            path="/proyectos/:proyectoId/vehiculos/:vehiculoId/documentos"
+            element={<PaginaDocumentosVehiculo />}
+          />
+          <Route
+            path="/proyectos/:proyectoId/conductores/:conductorId/documentos"
+            element={<PaginaDocumentosConductor />}
           />
 
           <Route path="*"element={<PaginaNoEncontrada />} />

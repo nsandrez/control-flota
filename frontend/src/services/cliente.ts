@@ -47,7 +47,11 @@ function mensajeDe(cuerpo: unknown, estado: number): string {
   return `Error inesperado del servidor (${estado})`
 }
 
-// Adds the Bearer token, maps network failures and non-2xx
+function esFormData(cuerpo: unknown): cuerpo is FormData {
+  return typeof FormData !== 'undefined' && cuerpo instanceof FormData
+}
+
+// Shared by JSON calls and downloads: adds the Bearer token, maps network failures and non-2xx
 // answers to ErrorApi and drops the session on 401. Resolves with the successful Response.
 async function enviar(
   ruta: string,
@@ -60,8 +64,11 @@ async function enviar(
   const token = obtenerToken()
   if (token) cabeceras.Authorization = `Bearer ${token}`
 
-  let cuerpoHttp: string | undefined
-  if (cuerpo !== undefined) {
+  let cuerpoHttp: BodyInit | undefined
+  if (esFormData(cuerpo)) {
+    // No Content-Type on purpose: the browser adds multipart/form-data with its boundary
+    cuerpoHttp = cuerpo
+  } else if (cuerpo !== undefined) {
     cabeceras['Content-Type'] = 'application/json'
     cuerpoHttp = JSON.stringify(cuerpo)
   }
@@ -90,4 +97,39 @@ async function enviar(
 export async function solicitar<T>(ruta: string, opciones: OpcionesSolicitud = {}): Promise<T> {
   const respuesta = await enviar(ruta, opciones, 'application/json')
   return (await leerJson(respuesta)) as T
+}
+
+export interface ArchivoDescargado {
+  blob: Blob
+  // Taken from Content-Disposition; null when the header is missing or not readable
+  nombreArchivo: string | null
+}
+
+function nombreDeContentDisposition(cabecera: string | null): string | null {
+  if (!cabecera) return null
+  const codificado = /filename\*\s*=\s*UTF-8''([^;]+)/i.exec(cabecera)
+  if (codificado) {
+    try {
+      return decodeURIComponent(codificado[1].trim())
+    } catch {
+      // Fall through to the plain filename
+    }
+  }
+  const simple = /filename\s*=\s*"([^"]*)"/i.exec(cabecera)
+  return simple?.[1] || null
+}
+
+// Authenticated binary download (the token travels in the Authorization header, never in a URL)
+export async function descargarArchivo(
+  ruta: string,
+  opciones: Omit<OpcionesSolicitud, 'cuerpo' | 'metodo'> = {},
+): Promise<ArchivoDescargado> {
+  const respuesta = await enviar(ruta, { ...opciones, metodo: 'GET' }, '*/*')
+  try {
+    const blob = await respuesta.blob()
+    return { blob, nombreArchivo: nombreDeContentDisposition(respuesta.headers.get('Content-Disposition')) }
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') throw error
+    throw new ErrorApi(0, 'No se pudo descargar el archivo. Intente de nuevo.')
+  }
 }
