@@ -25,6 +25,21 @@ const ESTILO_ENLACE =
 function Acciones({ proyecto, puedeEditar, onDesactivar, onReactivar }: PropsAcciones) {
   return (
     <div className="flex flex-wrap gap-2">
+      {/* Visible for every role */}
+      <Link
+        to={`/proyectos/${proyecto.id}/vehiculos`}
+        aria-label={`Vehículos de ${proyecto.nombre}`}
+        className={ESTILO_ENLACE}
+      >
+        Vehículos
+      </Link>
+      <Link
+        to={`/proyectos/${proyecto.id}/conductores`}
+        aria-label={`Conductores de ${proyecto.nombre}`}
+        className={ESTILO_ENLACE}
+      >
+        Conductores
+      </Link>
       {puedeEditar && (
         <Link
           to={`/proyectos/${proyecto.id}/editar`}
